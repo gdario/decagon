@@ -1,11 +1,13 @@
-from __future__ import division
-from __future__ import print_function
+import tensorflow.compat.v1 as tf
+
+# from __future__ import division
+# from __future__ import print_function
 from operator import itemgetter
 from itertools import combinations
 import time
 import os
 
-import tensorflow as tf
+# import tensorflow as tf
 import numpy as np
 import networkx as nx
 import scipy.sparse as sp
@@ -15,6 +17,8 @@ from decagon.deep.optimizer import DecagonOptimizer
 from decagon.deep.model import DecagonModel
 from decagon.deep.minibatch import EdgeMinibatchIterator
 from decagon.utility import rank_metrics, preprocessing
+
+tf.disable_v2_behavior()
 
 # Train on CPU (hide GPU) due to memory constraints
 os.environ['CUDA_VISIBLE_DEVICES'] = ""
@@ -81,18 +85,18 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
 
 def construct_placeholders(edge_types):
     placeholders = {
-        'batch': tf.placeholder(tf.int32, name='batch'),
-        'batch_edge_type_idx': tf.placeholder(tf.int32, shape=(), name='batch_edge_type_idx'),
-        'batch_row_edge_type': tf.placeholder(tf.int32, shape=(), name='batch_row_edge_type'),
-        'batch_col_edge_type': tf.placeholder(tf.int32, shape=(), name='batch_col_edge_type'),
-        'degrees': tf.placeholder(tf.int32),
-        'dropout': tf.placeholder_with_default(0., shape=()),
+        'batch': tf.compat.v1.placeholder(tf.int32, name='batch'),
+        'batch_edge_type_idx': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_edge_type_idx'),
+        'batch_row_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_row_edge_type'),
+        'batch_col_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_col_edge_type'),
+        'degrees': tf.compat.v1.placeholder(tf.int32),
+        'dropout': tf.compat.v1.placeholder_with_default(0., shape=()),
     }
     placeholders.update({
-        'adj_mats_%d,%d,%d' % (i, j, k): tf.sparse_placeholder(tf.float32)
+        'adj_mats_%d,%d,%d' % (i, j, k): tf.compat.v1.sparse_placeholder(tf.float32)
         for i, j in edge_types for k in range(edge_types[i,j])})
     placeholders.update({
-        'feat_%d' % i: tf.sparse_placeholder(tf.float32)
+        'feat_%d' % i: tf.compat.v1.sparse_placeholder(tf.float32)
         for i, _ in edge_types})
     return placeholders
 
@@ -104,25 +108,37 @@ def construct_placeholders(edge_types):
 
 ####
 # The following code uses artificially generated and very small networks.
-# Expect less than excellent performance as these random networks do not have any interesting structure.
-# The purpose of main.py is to show how to use the code!
+# Expect less than excellent performance as these random networks do not have
+# any interesting structure.  The purpose of main.py is to show how to use the
+# code!
 #
-# All preprocessed datasets used in the drug combination study are at: http://snap.stanford.edu/decagon:
-# (1) Download datasets from http://snap.stanford.edu/decagon to your local machine.
-# (2) Replace dummy toy datasets used here with the actual datasets you just downloaded.
-# (3) Train & test the model.
+# All preprocessed datasets used in the drug combination study are at:
+# http://snap.stanford.edu/decagon: (1) Download datasets from
+# http://snap.stanford.edu/decagon to your local machine.  (2) Replace dummy
+# toy datasets used here with the actual datasets you just downloaded.  (3)
+# Train & test the model.
 ####
 
 val_test_size = 0.05
-n_genes = 500
-n_drugs = 400
-n_drugdrug_rel_types = 3
+n_genes = 500  # Number of genes
+n_drugs = 400  # Number of drugs
+n_drugdrug_rel_types = 3  # Number of polypharmacy side effects
+
+########## GENE-GENE INTERACTION NETWORK ########## 
+# Create a graph with 50*10 nodes and part it into 50 subgraphs of 10 elements
+# each. Nodes within a subgraph are connected with probability 0.2. Nodes
+# between subgraphs are connected with probability 0.05.
 gene_net = nx.planted_partition_graph(50, 10, 0.2, 0.05, seed=42)
 
+# Adjacency matrix for the gene netowrk.
 gene_adj = nx.adjacency_matrix(gene_net)
 gene_degrees = np.array(gene_adj.sum(axis=0)).squeeze()
 
-gene_drug_adj = sp.csr_matrix((10 * np.random.randn(n_genes, n_drugs) > 15).astype(int))
+########## GENE-DRUG INTERACTION NETWORK ##########
+# NOTE: decagon supports directed graphs, in which case the adjacency matrix
+#       will not be symmetrical.
+gene_drug_adj = sp.csr_matrix(
+        (10 * np.random.randn(n_genes, n_drugs) > 15).astype(int))
 drug_gene_adj = gene_drug_adj.transpose(copy=True)
 
 drug_drug_adj_list = []
@@ -137,6 +153,10 @@ drug_degrees_list = [np.array(drug_adj.sum(axis=0)).squeeze() for drug_adj in dr
 
 
 # data representation
+# The tuples used as keys in this dictionary represent the node types:
+# 0: non-drug node.
+# 1: drug node.
+# (1, 1) is a drug-drug interaction. (1, 0) is a drug-gene interaction etc.
 adj_mats_orig = {
     (0, 0): [gene_adj, gene_adj.transpose(copy=True)],
     (0, 1): [gene_drug_adj],
@@ -190,7 +210,7 @@ print("Edge types:", "%d" % num_edge_types)
 #
 ###########################################################
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('neg_sample_size', 1, 'Negative sample size.')
 flags.DEFINE_float('learning_rate', 0.001, 'Initial learning rate.')
@@ -234,7 +254,7 @@ model = DecagonModel(
 )
 
 print("Create optimizer")
-with tf.name_scope('optimizer'):
+with tf.compat.v1.name_scope('optimizer'):
     opt = DecagonOptimizer(
         embeddings=model.embeddings,
         latent_inters=model.latent_inters,
@@ -248,8 +268,8 @@ with tf.name_scope('optimizer'):
     )
 
 print("Initialize session")
-sess = tf.Session()
-sess.run(tf.global_variables_initializer())
+sess = tf.compat.v1.Session()
+sess.run(tf.compat.v1.global_variables_initializer())
 feed_dict = {}
 
 ###########################################################

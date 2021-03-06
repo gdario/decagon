@@ -1,0 +1,191 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 12 files
+Detected 0 issues that require attention
+--------------------------------------------------------------------------------
+================================================================================
+Detailed log follows:
+
+================================================================================
+================================================================================
+Input tree: 'decagon/'
+================================================================================
+--------------------------------------------------------------------------------
+Processing file 'decagon/main.py'
+ outputting to 'decagon_v2/main.py'
+--------------------------------------------------------------------------------
+
+84:17: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+85:31: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+86:31: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+87:31: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+88:19: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+89:19: INFO: Renamed 'tf.placeholder_with_default' to 'tf.compat.v1.placeholder_with_default'
+92:41: INFO: Renamed 'tf.sparse_placeholder' to 'tf.compat.v1.sparse_placeholder'
+95:23: INFO: Renamed 'tf.sparse_placeholder' to 'tf.compat.v1.sparse_placeholder'
+193:8: INFO: Renamed 'tf.app.flags' to 'tf.compat.v1.app.flags'
+237:5: INFO: `name` passed to `name_scope`. Because you may be re-entering an existing scope, it is not safe to convert automatically,  the v2 name_scope does not support re-entering scopes by name.
+
+237:5: INFO: Renamed 'tf.name_scope' to 'tf.compat.v1.name_scope'
+251:7: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+252:9: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/polypharmacy/utility.py'
+ outputting to 'decagon_v2/polypharmacy/utility.py'
+--------------------------------------------------------------------------------
+
+ERROR: Failed to parse.
+Traceback (most recent call last):
+  File "/home/giovenko/miniconda3/envs/tf/lib/python3.9/site-packages/tensorflow/tools/compatibility/ast_edits.py", line 940, in update_string_pasta
+    t = pasta.parse(text)
+  File "/home/giovenko/miniconda3/envs/tf/lib/python3.9/site-packages/pasta/__init__.py", line 23, in parse
+    t = ast_utils.parse(src)
+  File "/home/giovenko/miniconda3/envs/tf/lib/python3.9/site-packages/pasta/base/ast_utils.py", line 56, in parse
+    tree = ast.parse(sanitize_source(src))
+  File "/home/giovenko/miniconda3/envs/tf/lib/python3.9/ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+  File "<unknown>", line 12
+    print 'Reading: %s' % fname
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('Reading: %s' % fname)?
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/__init__.py'
+ outputting to 'decagon_v2/decagon/__init__.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/utility/rank_metrics.py'
+ outputting to 'decagon_v2/decagon/utility/rank_metrics.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/utility/preprocessing.py'
+ outputting to 'decagon_v2/decagon/utility/preprocessing.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/utility/__init__.py'
+ outputting to 'decagon_v2/decagon/utility/__init__.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/model.py'
+ outputting to 'decagon_v2/decagon/deep/model.py'
+--------------------------------------------------------------------------------
+
+8:8: INFO: Renamed 'tf.app.flags' to 'tf.compat.v1.app.flags'
+35:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+37:20: INFO: Renamed 'tf.get_collection' to 'tf.compat.v1.get_collection'
+37:38: INFO: Renamed 'tf.GraphKeys' to 'tf.compat.v1.GraphKeys'
+125:26: INFO: Renamed 'tf.diag' to 'tf.linalg.tensor_diag'
+132:26: INFO: Renamed 'tf.diag' to 'tf.linalg.tensor_diag'
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/inits.py'
+ outputting to 'decagon_v2/decagon/deep/inits.py'
+--------------------------------------------------------------------------------
+
+10:14: INFO: Renamed 'tf.random_uniform' to 'tf.random.uniform'
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/optimizer.py'
+ outputting to 'decagon_v2/decagon/deep/optimizer.py'
+--------------------------------------------------------------------------------
+
+4:8: INFO: Renamed 'tf.app.flags' to 'tf.compat.v1.app.flags'
+51:23: INFO: Renamed 'tf.diag_part' to 'tf.linalg.tensor_diag_part'
+55:27: INFO: Renamed 'tf.diag_part' to 'tf.linalg.tensor_diag_part'
+83:36: INFO: Added keywords to args of function 'tf.transpose'
+105:47: INFO: Added keywords to args of function 'tf.transpose'
+110:25: INFO: Renamed 'tf.train.AdamOptimizer' to 'tf.compat.v1.train.AdamOptimizer'
+118:15: INFO: Added keywords to args of function 'tf.reduce_sum'
+125:15: INFO: Added keywords to args of function 'tf.reduce_sum'
+125:68: INFO: Added keywords to args of function 'tf.reduce_sum'
+140:9: INFO: Renamed 'tf.op_scope' to 'tf.compat.v1.op_scope'
+142:17: INFO: Added keywords to args of function 'tf.convert_to_tensor'
+143:18: INFO: Added keywords to args of function 'tf.convert_to_tensor'
+154:18: INFO: Added keywords to args of function 'tf.shape'
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/minibatch.py'
+ outputting to 'decagon_v2/decagon/deep/minibatch.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/__init__.py'
+ outputting to 'decagon_v2/decagon/deep/__init__.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file 'decagon/decagon/deep/layers.py'
+ outputting to 'decagon_v2/decagon/deep/layers.py'
+--------------------------------------------------------------------------------
+
+5:8: INFO: Renamed 'tf.app.flags' to 'tf.compat.v1.app.flags'
+28:21: INFO: Renamed 'tf.random_uniform' to 'tf.random.uniform'
+30:14: INFO: Renamed 'tf.sparse_retain' to 'tf.sparse.retain'
+65:13: INFO: `name` passed to `name_scope`. Because you may be re-entering an existing scope, it is not safe to convert automatically,  the v2 name_scope does not support re-entering scopes by name.
+
+65:13: INFO: Renamed 'tf.name_scope' to 'tf.compat.v1.name_scope'
+80:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+89:16: INFO: Renamed 'tf.sparse_tensor_dense_matmul' to 'tf.sparse.sparse_dense_matmul'
+90:16: INFO: Renamed 'tf.sparse_tensor_dense_matmul' to 'tf.sparse.sparse_dense_matmul'
+93:46: INFO: Renamed keyword argument for tf.nn.l2_normalize from dim to axis
+104:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+112:16: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+114:16: INFO: Renamed 'tf.sparse_tensor_dense_matmul' to 'tf.sparse.sparse_dense_matmul'
+117:46: INFO: Renamed keyword argument for tf.nn.l2_normalize from dim to axis
+127:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+139:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+140:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+141:23: INFO: Renamed 'tf.diag' to 'tf.linalg.tensor_diag'
+145:38: INFO: Added keywords to args of function 'tf.transpose'
+156:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+166:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+167:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+168:23: INFO: Renamed 'tf.diag' to 'tf.linalg.tensor_diag'
+170:50: INFO: Added keywords to args of function 'tf.transpose'
+181:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+190:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+191:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+193:50: INFO: Added keywords to args of function 'tf.transpose'
+209:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+210:25: INFO: Changing keep_prob arg of tf.nn.dropout to rate, and recomputing value.
+
+211:40: INFO: Added keywords to args of function 'tf.transpose'
+--------------------------------------------------------------------------------
+
