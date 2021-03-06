@@ -108,3 +108,16 @@ The `construct_placeholders()` function takes `edge_types` defined above and bui
 
 ### Edge Minibatch Iterator
 
+#### Methods of the `EdgeMinibatchIterator` class
+
+- `__init__()`
+- `preprocess_graph()`
+- `_ismember()`
+- `mask_test_edges()`
+- `end()`
+- `update_feed_dict()`
+- `batch_feed_dict()`
+- `next_minibatch_feed_dict()`
+- `num_training_batches()`
+- `val_feed_dict()`
+- `shuffle()`
