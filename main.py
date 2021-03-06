@@ -102,7 +102,7 @@ def construct_placeholders(edge_types):
     placeholders.update({
         'adj_mats_%d,%d,%d' % (i, j, k):
         tf.compat.v1.sparse_placeholder(tf.float32)
-        for i, j in edge_types for k in range(edge_types[i,j])})
+        for i, j in edge_types for k in range(edge_types[i, j])})
     placeholders.update({
         'feat_%d' % i: tf.compat.v1.sparse_placeholder(tf.float32)
         for i, _ in edge_types})
@@ -114,7 +114,6 @@ def construct_placeholders(edge_types):
 #
 ###########################################################
 
-####
 # The following code uses artificially generated and very small networks.
 # Expect less than excellent performance as these random networks do not have
 # any interesting structure.  The purpose of main.py is to show how to use the
@@ -125,7 +124,6 @@ def construct_placeholders(edge_types):
 # http://snap.stanford.edu/decagon to your local machine.  (2) Replace dummy
 # toy datasets used here with the actual datasets you just downloaded.  (3)
 # Train & test the model.
-####
 
 
 val_test_size = 0.05
@@ -187,7 +185,7 @@ degrees = {
     1: drug_degrees_list + drug_degrees_list,
 }
 
-# ATTENTION: this is the most confusing part. The comments below represent my
+# WARNING: this is the most confusing part. The comments below represent my
 # current understanding, and should be taken with great care.
 # the `preprocessing.sparse_to_tuple()` function takes a sparse matrix and
 # returns three things: 1) a list of coordinates, 2) a list of values, 3) the
@@ -250,8 +248,8 @@ flags.DEFINE_float('dropout', 0.1, 'Dropout rate (1 - keep probability).')
 flags.DEFINE_float('max_margin', 0.1, 'Max margin parameter in hinge loss')
 flags.DEFINE_integer('batch_size', 512, 'minibatch size.')
 flags.DEFINE_boolean('bias', True, 'Bias term.')
-# Important -- Do not evaluate/print validation performance every iteration as it can take
-# substantial amount of time
+# Important -- Do not evaluate/print validation performance every iteration as
+# it can take substantial amount of time
 PRINT_PROGRESS_EVERY = 150
 
 print("Defining placeholders")
@@ -313,7 +311,8 @@ for epoch in range(FLAGS.epochs):
     itr = 0
     while not minibatch.end():
         # Construct feed dictionary
-        feed_dict = minibatch.next_minibatch_feed_dict(placeholders=placeholders)
+        feed_dict = minibatch.next_minibatch_feed_dict(
+            placeholders=placeholders)
         feed_dict = minibatch.update_feed_dict(
             feed_dict=feed_dict,
             dropout=FLAGS.dropout,
@@ -322,7 +321,8 @@ for epoch in range(FLAGS.epochs):
         t = time.time()
 
         # Training step: run single weight update
-        outs = sess.run([opt.opt_op, opt.cost, opt.batch_edge_type_idx], feed_dict=feed_dict)
+        outs = sess.run([opt.opt_op, opt.cost, opt.batch_edge_type_idx],
+                        feed_dict=feed_dict)
         train_cost = outs[1]
         batch_edge_type = outs[2]
 
@@ -331,10 +331,13 @@ for epoch in range(FLAGS.epochs):
                 minibatch.val_edges, minibatch.val_edges_false,
                 minibatch.idx2edge_type[minibatch.current_edge_type_idx])
 
-            print("Epoch:", "%04d" % (epoch + 1), "Iter:", "%04d" % (itr + 1), "Edge:", "%04d" % batch_edge_type,
+            print("Epoch:", "%04d" % (epoch + 1), "Iter:",
+                  "%04d" % (itr + 1), "Edge:", "%04d" % batch_edge_type,
                   "train_loss=", "{:.5f}".format(train_cost),
-                  "val_roc=", "{:.5f}".format(val_auc), "val_auprc=", "{:.5f}".format(val_auprc),
-                  "val_apk=", "{:.5f}".format(val_apk), "time=", "{:.5f}".format(time.time() - t))
+                  "val_roc=", "{:.5f}".format(val_auc),
+                  "val_auprc=", "{:.5f}".format(val_auprc),
+                  "val_apk=", "{:.5f}".format(val_apk), "time=",
+                  "{:.5f}".format(time.time() - t))
 
         itr += 1
 
@@ -342,9 +345,13 @@ print("Optimization finished!")
 
 for et in range(num_edge_types):
     roc_score, auprc_score, apk_score = get_accuracy_scores(
-        minibatch.test_edges, minibatch.test_edges_false, minibatch.idx2edge_type[et])
+        minibatch.test_edges, minibatch.test_edges_false,
+        minibatch.idx2edge_type[et])
     print("Edge type=", "[%02d, %02d, %02d]" % minibatch.idx2edge_type[et])
-    print("Edge type:", "%04d" % et, "Test AUROC score", "{:.5f}".format(roc_score))
-    print("Edge type:", "%04d" % et, "Test AUPRC score", "{:.5f}".format(auprc_score))
-    print("Edge type:", "%04d" % et, "Test AP@k score", "{:.5f}".format(apk_score))
+    print("Edge type:", "%04d" % et, "Test AUROC score",
+          "{:.5f}".format(roc_score))
+    print("Edge type:", "%04d" % et, "Test AUPRC score",
+          "{:.5f}".format(auprc_score))
+    print("Edge type:", "%04d" % et, "Test AP@k score",
+          "{:.5f}".format(apk_score))
     print()

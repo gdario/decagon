@@ -1,7 +1,7 @@
 # Object catalog
 
 This document contains a list of the objects used in the `main.py` function.
- 
+
 ## Gene-gene interaction network
 
 - `gene_net`: network of gene-gene interactions.
@@ -49,7 +49,7 @@ This function takes a sparse matrix and returns three things:
 
 #### Example
 
-```py
+```{py}
 x = np.array([[0, 0, 1], [0, 1, 0], [0, 1, 1], [0, 1, 2]])
 sx = sp.csr_matrix(x)
 preprocessing.sparse_to_tuple(sx)
@@ -75,5 +75,36 @@ The dictionaries below contain the information about node-level features.
 - `nonzero_feat`: dictionary with keys 0 and 1 and values `gene_nonzero_feat` and `drug_nonzero_feat` respectively.
 - `feat`: dictionary with keys 0 and 1 and values `gene_feat` and `drug_feat` respectively. These are the tuples containing coordinates, values and shape.
 - `edge_type2dim`: dictionary with the same keys as `adj_mats_orig`. The values are lists containing the shapes of all the matrices contained in each value of `adj_mats_orig`.
-- `edge_types`: dictionary with the same keys as `adj_mats_orig` containing, for each key, the length of the corresponding value (which is a list).
+- `edge_types`: dictionary with the same keys as `adj_mats_orig` containing, for each key, the length of the corresponding value. See below.
 - `num_edge_types`: sum of the values of `edge_types`.
+
+### `edge_types`
+
+The `edge_types` dictionary contains the keys `(0, 0)`, `(0, 1)`, `(1, 0)`, `(1, 1)`. The value associated with each key is the length of the list associated with the same key in `mat_adj_orig`. This list contains the adjacency matrix for that key-pair type and, if the key pair contains nodes of the same type, i.e., is in the form `(i, i)`, also for the transpose. If we have 3 edge types, as in the toy example that ships with `main.py`, the dictionary looks as follows:
+
+
+```py
+{
+    (0, 0): 2,  # 1 type of relation for gene-gene nodes + transpose.
+    (0, 1): 1,  # 1 type of relation for gene-drug pairs.
+    (1, 0): 1,  # 1 type of relation for drug-gene pairs.
+    (1, 1): 6   # 3 types of relation for drug-drug nodes + transposes.
+}
+```
+
+## Placeholders
+
+The `construct_placeholders()` function takes `edge_types` defined above and builds a dictionary of placeholders, and precisely (NOTE: ??? means I don't yet know what the placeholder is supposed to store):
+
+- `batch`: integer placeholder for the bach count.
+- `batch_edge_type_idx`: integer placeholder for the index of the edge type.???
+- `batch_row_edge_type`: integer placeholder for the edge type. ???
+- `batch_col_edge_type`: ???
+- `degrees`: integer placeholder for the degrees.
+- `dropout`: placeholder with default (0 = no dropout).
+- `adj_mats_i,j,k`: sparse placeholder for the adjacency matrix associated with relation `k` in pair `(i, j)`.
+
+## Iterators
+
+### Edge Minibatch Iterator
+
