@@ -40,7 +40,8 @@ np.random.seed(0)
 
 def get_accuracy_scores(edges_pos, edges_neg, edge_type):
     feed_dict.update({placeholders['dropout']: 0})
-    feed_dict.update({placeholders['batch_edge_type_idx']: minibatch.edge_type2idx[edge_type]})
+    feed_dict.update({placeholders['batch_edge_type_idx']:
+                      minibatch.edge_type2idx[edge_type]})
     feed_dict.update({placeholders['batch_row_edge_type']: edge_type[0]})
     feed_dict.update({placeholders['batch_col_edge_type']: edge_type[1]})
     rec = sess.run(opt.predictions, feed_dict=feed_dict)
@@ -56,7 +57,8 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
     for u, v in edges_pos[edge_type[:2]][edge_type[2]]:
         score = sigmoid(rec[u, v])
         preds.append(score)
-        assert adj_mats_orig[edge_type[:2]][edge_type[2]][u,v] == 1, 'Problem 1'
+        assert adj_mats_orig[edge_type[:2]][
+            edge_type[2]][u, v] == 1, 'Problem 1'
 
         actual.append(edge_ind)
         predicted.append((score, edge_ind))
@@ -66,7 +68,8 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
     for u, v in edges_neg[edge_type[:2]][edge_type[2]]:
         score = sigmoid(rec[u, v])
         preds_neg.append(score)
-        assert adj_mats_orig[edge_type[:2]][edge_type[2]][u,v] == 0, 'Problem 0'
+        assert adj_mats_orig[edge_type[:2]][
+            edge_type[2]][u, v] == 0, 'Problem 0'
 
         predicted.append((score, edge_ind))
         edge_ind += 1
@@ -74,7 +77,8 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
     preds_all = np.hstack([preds, preds_neg])
     preds_all = np.nan_to_num(preds_all)
     labels_all = np.hstack([np.ones(len(preds)), np.zeros(len(preds_neg))])
-    predicted = list(zip(*sorted(predicted, reverse=True, key=itemgetter(0))))[1]
+    predicted = list(zip(
+        *sorted(predicted, reverse=True, key=itemgetter(0))))[1]
 
     roc_sc = metrics.roc_auc_score(labels_all, preds_all)
     aupr_sc = metrics.average_precision_score(labels_all, preds_all)
@@ -86,14 +90,18 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
 def construct_placeholders(edge_types):
     placeholders = {
         'batch': tf.compat.v1.placeholder(tf.int32, name='batch'),
-        'batch_edge_type_idx': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_edge_type_idx'),
-        'batch_row_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_row_edge_type'),
-        'batch_col_edge_type': tf.compat.v1.placeholder(tf.int32, shape=(), name='batch_col_edge_type'),
+        'batch_edge_type_idx': tf.compat.v1.placeholder(
+            tf.int32, shape=(), name='batch_edge_type_idx'),
+        'batch_row_edge_type': tf.compat.v1.placeholder(
+            tf.int32, shape=(), name='batch_row_edge_type'),
+        'batch_col_edge_type': tf.compat.v1.placeholder(
+            tf.int32, shape=(), name='batch_col_edge_type'),
         'degrees': tf.compat.v1.placeholder(tf.int32),
         'dropout': tf.compat.v1.placeholder_with_default(0., shape=()),
     }
     placeholders.update({
-        'adj_mats_%d,%d,%d' % (i, j, k): tf.compat.v1.sparse_placeholder(tf.float32)
+        'adj_mats_%d,%d,%d' % (i, j, k):
+        tf.compat.v1.sparse_placeholder(tf.float32)
         for i, j in edge_types for k in range(edge_types[i,j])})
     placeholders.update({
         'feat_%d' % i: tf.compat.v1.sparse_placeholder(tf.float32)
@@ -119,12 +127,13 @@ def construct_placeholders(edge_types):
 # Train & test the model.
 ####
 
+
 val_test_size = 0.05
 n_genes = 500  # Number of genes
 n_drugs = 400  # Number of drugs
 n_drugdrug_rel_types = 3  # Number of polypharmacy side effects
 
-########## GENE-GENE INTERACTION NETWORK ########## 
+# GENE-GENE INTERACTION NETWORK
 # Create a graph with 50*10 nodes and part it into 50 subgraphs of 10 elements
 # each. Nodes within a subgraph are connected with probability 0.2. Nodes
 # between subgraphs are connected with probability 0.05.
@@ -134,13 +143,16 @@ gene_net = nx.planted_partition_graph(50, 10, 0.2, 0.05, seed=42)
 gene_adj = nx.adjacency_matrix(gene_net)
 gene_degrees = np.array(gene_adj.sum(axis=0)).squeeze()
 
-########## GENE-DRUG INTERACTION NETWORK ##########
+# GENE-DRUG INTERACTION NETWORK
 # NOTE: decagon supports directed graphs, in which case the adjacency matrix
 #       will not be symmetrical.
 gene_drug_adj = sp.csr_matrix(
         (10 * np.random.randn(n_genes, n_drugs) > 15).astype(int))
 drug_gene_adj = gene_drug_adj.transpose(copy=True)
 
+# DRUG-DRUG INTERACTION NETWORKS
+# We need to create `n_drugdrug_rel_types` drug-drug interaction networks, i.e.
+# one for each type of side-effect.
 drug_drug_adj_list = []
 tmp = np.dot(drug_gene_adj, gene_drug_adj)
 for i in range(n_drugdrug_rel_types):
@@ -149,24 +161,39 @@ for i in range(n_drugdrug_rel_types):
         if tmp[d1, d2] == i + 4:
             mat[d1, d2] = mat[d2, d1] = 1.
     drug_drug_adj_list.append(sp.csr_matrix(mat))
-drug_degrees_list = [np.array(drug_adj.sum(axis=0)).squeeze() for drug_adj in drug_drug_adj_list]
+drug_degrees_list = [np.array(drug_adj.sum(axis=0)).squeeze()
+                     for drug_adj in drug_drug_adj_list]
 
 
-# data representation
+# Dictionary of adjacency matrices indexed by interaction type.
 # The tuples used as keys in this dictionary represent the node types:
 # 0: non-drug node.
 # 1: drug node.
 # (1, 1) is a drug-drug interaction. (1, 0) is a drug-gene interaction etc.
+# Note that each value is a list containing an adjacency matrix and its
+# transpose.
 adj_mats_orig = {
     (0, 0): [gene_adj, gene_adj.transpose(copy=True)],
     (0, 1): [gene_drug_adj],
     (1, 0): [drug_gene_adj],
-    (1, 1): drug_drug_adj_list + [x.transpose(copy=True) for x in drug_drug_adj_list],
+    (1, 1): drug_drug_adj_list +
+    [x.transpose(copy=True)for x in drug_drug_adj_list],
 }
+
+# Dictionary of degrees indexed by node type. Note that each value is a list
+# containing the degree of an adjacency matrix and its transpose.
 degrees = {
     0: [gene_degrees, gene_degrees],
     1: drug_degrees_list + drug_degrees_list,
 }
+
+# ATTENTION: this is the most confusing part. The comments below represent my
+# current understanding, and should be taken with great care.
+# the `preprocessing.sparse_to_tuple()` function takes a sparse matrix and
+# returns three things: 1) a list of coordinates, 2) a list of values, 3) the
+# original shape of the sparse matrix.
+# TO CLARIFY: what is the distinction between `X_nonzero_feat` and
+# `X_num_feat`? The latter is just the number of features, but the former?
 
 # featureless (genes)
 gene_feat = sp.identity(n_genes)
@@ -192,7 +219,8 @@ feat = {
     1: drug_feat,
 }
 
-edge_type2dim = {k: [adj.shape for adj in adjs] for k, adjs in adj_mats_orig.items()}
+edge_type2dim = {k: [adj.shape for adj in adjs]
+                 for k, adjs in adj_mats_orig.items()}
 edge_type2decoder = {
     (0, 0): 'bilinear',
     (0, 1): 'bilinear',
