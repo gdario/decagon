@@ -1,0 +1,6 @@
+bio-decagon-ppi.tar.gz
+bio-decagon-targets.tar.gz
+bio-decagon-targets-all.tar.gz
+bio-decagon-combo.tar.gz
+bio-decagon-mono.tar.gz
+bio-decagon-effectcategories.tar.gz
